@@ -1,0 +1,66 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - app-network
+
+  php:
+    container_name: app
+    build:
+      context: ./src
+      dockerfile: ../docker/php/Dockerfile
+    volumes:
+      - ./src:/var/www
+    networks:
+      - app-network
+    depends_on:
+      - mysql
+      - redis
+
+  # Fix: dedicated Vite service so it runs independently from php-fpm
+  node:
+    build:
+      context: ./src
+      dockerfile: ../docker/php/Dockerfile   # reuses same image (has Node installed)
+    container_name: vite
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+    ports:
+      - "5173:5173"   # Vite
+    command: npm run dev
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
