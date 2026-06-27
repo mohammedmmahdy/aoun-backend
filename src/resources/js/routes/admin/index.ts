@@ -1,4 +1,5 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition } from './../../wayfinder'
+import profile from './profile'
 /**
 * @see \App\Http\Controllers\Admin\AuthController::loginForm
 * @see app/Http/Controllers/Admin/AuthController.php:11
@@ -78,6 +79,40 @@ login.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
 })
 
 /**
+* @see \App\Http\Controllers\Admin\AuthController::logout
+* @see app/Http/Controllers/Admin/AuthController.php:31
+* @route '/logout'
+*/
+export const logout = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: logout.url(options),
+    method: 'post',
+})
+
+logout.definition = {
+    methods: ["post"],
+    url: '/logout',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\Admin\AuthController::logout
+* @see app/Http/Controllers/Admin/AuthController.php:31
+* @route '/logout'
+*/
+logout.url = (options?: RouteQueryOptions) => {
+    return logout.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\AuthController::logout
+* @see app/Http/Controllers/Admin/AuthController.php:31
+* @route '/logout'
+*/
+logout.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: logout.url(options),
+    method: 'post',
+})
+
+/**
 * @see \App\Http\Controllers\Admin\DashboardController::dashboard
 * @see app/Http/Controllers/Admin/DashboardController.php:10
 * @route '/dashboard'
@@ -121,10 +156,57 @@ dashboard.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     method: 'head',
 })
 
+/**
+* @see \App\Http\Controllers\Admin\ProfileController::settings
+* @see app/Http/Controllers/Admin/ProfileController.php:27
+* @route '/settings'
+*/
+export const settings = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: settings.url(options),
+    method: 'get',
+})
+
+settings.definition = {
+    methods: ["get","head"],
+    url: '/settings',
+} satisfies RouteDefinition<["get","head"]>
+
+/**
+* @see \App\Http\Controllers\Admin\ProfileController::settings
+* @see app/Http/Controllers/Admin/ProfileController.php:27
+* @route '/settings'
+*/
+settings.url = (options?: RouteQueryOptions) => {
+    return settings.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\Admin\ProfileController::settings
+* @see app/Http/Controllers/Admin/ProfileController.php:27
+* @route '/settings'
+*/
+settings.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
+    url: settings.url(options),
+    method: 'get',
+})
+
+/**
+* @see \App\Http\Controllers\Admin\ProfileController::settings
+* @see app/Http/Controllers/Admin/ProfileController.php:27
+* @route '/settings'
+*/
+settings.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
+    url: settings.url(options),
+    method: 'head',
+})
+
 const admin = {
     loginForm: Object.assign(loginForm, loginForm),
     login: Object.assign(login, login),
+    logout: Object.assign(logout, logout),
     dashboard: Object.assign(dashboard, dashboard),
+    profile: Object.assign(profile, profile),
+    settings: Object.assign(settings, settings),
 }
 
 export default admin

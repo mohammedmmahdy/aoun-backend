@@ -27,4 +27,14 @@ class AuthController extends Controller
         $request->session()->regenerate();
         return redirect()->intended('/dashboard');
     }
+
+    function logout(Request $request)
+    {
+        auth()->guard('admin')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('admin.login-form');
+    }
 }

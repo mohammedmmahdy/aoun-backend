@@ -1,6 +1,12 @@
 <script setup>
 import { Head } from '@inertiajs/vue3';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import LayoutDefault from '@/layouts/default.vue';
+import { useDashboardPreferences } from '@/composables/useDashboardPreferences';
+
+const { preferences } = useDashboardPreferences();
+const lastRefreshedAt = ref(new Date());
+let refreshTimer = null;
 
 const metrics = [
     {
@@ -51,6 +57,54 @@ const queueItems = [
     { label: 'Support tickets', value: '9', progress: '48%' },
     { label: 'Access requests', value: '4', progress: '32%' },
 ];
+
+const heroStats = computed(() => [
+    { label: 'Tasks', value: '24' },
+    { label: 'Alerts', value: '8' },
+    ...(preferences.showHealth ? [{ label: 'Health', value: '96%' }] : []),
+]);
+
+const isCompact = computed(() => preferences.density === 'compact');
+const sectionGapClass = computed(() => isCompact.value ? 'mt-4' : 'mt-6');
+const gridGapClass = computed(() => isCompact.value ? 'gap-3' : 'gap-4');
+const panelGapClass = computed(() => isCompact.value ? 'gap-4' : 'gap-6');
+const heroPaddingClass = computed(() => isCompact.value ? 'px-5 py-5 sm:px-6 lg:px-8' : 'px-5 py-7 sm:px-8 lg:px-10');
+const metricPaddingClass = computed(() => isCompact.value ? 'p-4' : 'p-5');
+const panelPaddingClass = computed(() => isCompact.value ? 'p-4 sm:p-5' : 'p-5 sm:p-6');
+const chartHeightClass = computed(() => isCompact.value ? 'h-52' : 'h-64');
+const lastRefreshedLabel = computed(() => lastRefreshedAt.value.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+}));
+
+const refreshDashboard = () => {
+    lastRefreshedAt.value = new Date();
+};
+
+const syncRefreshTimer = () => {
+    if (refreshTimer) {
+        window.clearInterval(refreshTimer);
+        refreshTimer = null;
+    }
+
+    if (preferences.autoRefresh) {
+        refreshTimer = window.setInterval(refreshDashboard, preferences.refreshInterval * 1000);
+    }
+};
+
+onMounted(syncRefreshTimer);
+
+watch(
+    () => [preferences.autoRefresh, preferences.refreshInterval],
+    syncRefreshTimer,
+);
+
+onBeforeUnmount(() => {
+    if (refreshTimer) {
+        window.clearInterval(refreshTimer);
+    }
+});
 </script>
 
 <template>
@@ -63,7 +117,7 @@ const queueItems = [
         </template>
 
         <section class="overflow-hidden rounded-[28px] bg-[#12352d] text-[#fff8e8] shadow-[0_24px_80px_rgba(42,35,24,.14)]">
-            <div class="relative px-5 py-7 sm:px-8 lg:px-10">
+            <div class="relative" :class="heroPaddingClass">
                 <div class="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(244,240,232,.14)_1px,transparent_1px),linear-gradient(90deg,rgba(244,240,232,.14)_1px,transparent_1px)] [background-size:44px_44px]"></div>
                 <div class="relative flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-2xl">
@@ -76,31 +130,27 @@ const queueItems = [
                         <p class="mt-4 max-w-xl text-base leading-7 text-[#d9ebe5]">
                             Review activity, manage approvals, and keep the platform running from one focused admin dashboard.
                         </p>
+                        <p class="mt-4 text-sm font-black text-[#f8e5b9]">
+                            {{ preferences.autoRefresh ? `Auto-refresh every ${preferences.refreshInterval}s` : 'Auto-refresh paused' }} - Last refreshed {{ lastRefreshedLabel }}
+                        </p>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-3 rounded-2xl border border-white/15 bg-white/8 p-4 backdrop-blur">
-                        <div>
-                            <p class="text-2xl font-black">24</p>
-                            <p class="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#bed9d0]">Tasks</p>
-                        </div>
-                        <div>
-                            <p class="text-2xl font-black">8</p>
-                            <p class="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#bed9d0]">Alerts</p>
-                        </div>
-                        <div>
-                            <p class="text-2xl font-black">96%</p>
-                            <p class="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#bed9d0]">Health</p>
+                    <div class="grid gap-3 rounded-2xl border border-white/15 bg-white/8 p-4 backdrop-blur" :class="preferences.showHealth ? 'grid-cols-3' : 'grid-cols-2'">
+                        <div v-for="stat in heroStats" :key="stat.label">
+                            <p class="text-2xl font-black">{{ stat.value }}</p>
+                            <p class="mt-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#bed9d0]">{{ stat.label }}</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section class="grid sm:grid-cols-2 xl:grid-cols-4" :class="[sectionGapClass, gridGapClass]">
             <article
                 v-for="metric in metrics"
                 :key="metric.label"
-                class="rounded-2xl border border-[#ded5c5] bg-[#fffbf3] p-5 shadow-sm"
+                class="rounded-2xl border border-[#ded5c5] bg-[#fffbf3] shadow-sm"
+                :class="metricPaddingClass"
             >
                 <div class="flex items-start justify-between gap-4">
                     <div>
@@ -117,8 +167,8 @@ const queueItems = [
             </article>
         </section>
 
-        <section class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.55fr)]">
-            <div class="rounded-[28px] border border-[#ded5c5] bg-[#fffbf3] p-5 shadow-sm sm:p-6">
+        <section class="grid xl:grid-cols-[minmax(0,1.45fr)_minmax(340px,0.55fr)]" :class="[sectionGapClass, panelGapClass]">
+            <div class="rounded-[28px] border border-[#ded5c5] bg-[#fffbf3] shadow-sm" :class="panelPaddingClass">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p class="text-sm font-bold uppercase tracking-[0.2em] text-[#bd7b2f]">Performance</p>
@@ -129,7 +179,7 @@ const queueItems = [
                     </button>
                 </div>
 
-                <div class="mt-8 flex h-64 items-end gap-3 rounded-2xl border border-[#eadfce] bg-white p-4">
+                <div class="mt-8 flex items-end gap-3 rounded-2xl border border-[#eadfce] bg-white p-4" :class="chartHeightClass">
                     <div class="flex h-full flex-1 flex-col justify-end gap-2">
                         <div class="h-[42%] rounded-t-2xl bg-[#bed9d0]"></div>
                         <p class="text-center text-xs font-black text-[#66756d]">Mon</p>
@@ -161,8 +211,8 @@ const queueItems = [
                 </div>
             </div>
 
-            <div class="space-y-6">
-                <div class="rounded-[28px] border border-[#ded5c5] bg-[#fffbf3] p-5 shadow-sm sm:p-6">
+            <div :class="isCompact ? 'space-y-4' : 'space-y-6'">
+                <div class="rounded-[28px] border border-[#ded5c5] bg-[#fffbf3] shadow-sm" :class="panelPaddingClass">
                     <p class="text-sm font-bold uppercase tracking-[0.2em] text-[#bd7b2f]">Activity</p>
                     <h3 class="mt-2 text-2xl font-black tracking-tight text-[#17201c]">Recent updates</h3>
 
@@ -177,7 +227,7 @@ const queueItems = [
                     </div>
                 </div>
 
-                <div class="rounded-[28px] border border-[#ded5c5] bg-[#fffbf3] p-5 shadow-sm sm:p-6">
+                <div class="rounded-[28px] border border-[#ded5c5] bg-[#fffbf3] shadow-sm" :class="panelPaddingClass">
                     <p class="text-sm font-bold uppercase tracking-[0.2em] text-[#bd7b2f]">Actions</p>
                     <div class="mt-5 grid gap-3">
                         <button
@@ -196,7 +246,7 @@ const queueItems = [
             </div>
         </section>
 
-        <section class="mt-6 rounded-[28px] border border-[#ded5c5] bg-[#fffbf3] p-5 shadow-sm sm:p-6">
+        <section class="rounded-[28px] border border-[#ded5c5] bg-[#fffbf3] shadow-sm" :class="[sectionGapClass, panelPaddingClass]">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <p class="text-sm font-bold uppercase tracking-[0.2em] text-[#bd7b2f]">Queue</p>
@@ -205,8 +255,8 @@ const queueItems = [
                 <a href="#" class="text-sm font-black text-[#1d6a58] transition hover:text-[#bd7b2f]">View all</a>
             </div>
 
-            <div class="mt-6 grid gap-4 lg:grid-cols-3">
-                <article v-for="item in queueItems" :key="item.label" class="rounded-2xl border border-[#eadfce] bg-white p-5">
+            <div class="grid lg:grid-cols-3" :class="[sectionGapClass, gridGapClass]">
+                <article v-for="item in queueItems" :key="item.label" class="rounded-2xl border border-[#eadfce] bg-white" :class="metricPaddingClass">
                     <div class="flex items-center justify-between gap-4">
                         <p class="text-sm font-black text-[#27332f]">{{ item.label }}</p>
                         <p class="text-2xl font-black text-[#17201c]">{{ item.value }}</p>

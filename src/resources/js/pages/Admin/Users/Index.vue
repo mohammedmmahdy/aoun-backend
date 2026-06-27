@@ -17,6 +17,7 @@ const props = defineProps({
 });
 
 const page = usePage();
+const perPage = ref(props.users.per_page || 10);
 const search = ref(props.filters.search || '');
 const deleteForm = useForm({});
 
@@ -34,6 +35,18 @@ watch(search, (value) => {
         },
     );
 });
+
+watch(perPage, (value) => {
+    router.get(
+        '/users',
+        { per_page: value },
+        {
+            preserveState: true,
+            replace: true,
+            only: ['users', 'filters'],
+        },
+    );
+})
 
 const destroy = (user) => {
     if (!window.confirm(`Delete ${user.name}?`)) {
@@ -117,6 +130,17 @@ const destroy = (user) => {
                         placeholder="Search users"
                     >
                 </div>
+                <div class="group flex min-h-12 items-center rounded-2xl border border-[#d6ccbd] bg-white px-4 shadow-sm transition focus-within:border-[#1d6a58] focus-within:ring-4 focus-within:ring-[#1d6a58]/10 lg:max-w-sm">
+                    <select
+                        v-model="perPage"
+                        class="min-h-12  border-0 bg-transparent px-3 text-sm font-semibold text-[#17201c] outline-none placeholder:text-[#9aa49d]"
+                    >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                    </select>
+                </div>
+
             </div>
 
             <p v-if="flashSuccess" class="mt-5 rounded-2xl border border-[#bed9d0] bg-[#eef4ef] px-4 py-3 text-sm font-black text-[#1d6a58]">
@@ -193,7 +217,7 @@ const destroy = (user) => {
             </div>
 
             <div v-if="users.links.length > 3" class="mt-6 flex flex-wrap gap-2">
-                <a
+                <Link
                     v-for="link in users.links"
                     :key="link.label"
                     :href="link.url || '#'"

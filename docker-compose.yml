@@ -12,7 +12,7 @@ services:
       - app-network
 
   php:
-    container_name: app
+    container_name: php
     build:
       context: ./src
       dockerfile: ../docker/php/Dockerfile
@@ -22,9 +22,7 @@ services:
       - app-network
     depends_on:
       - mysql
-      - redis
-
-  # Fix: dedicated Vite service so it runs independently from php-fpm
+      - redis  
   node:
     build:
       context: ./src
