@@ -173,8 +173,8 @@ const destroy = (user) => {
                         <p class="hidden truncate text-sm font-semibold text-[#526158] md:block">{{ user.email }}</p>
                         <p class="text-sm font-semibold text-[#66756d]">{{ user.created_at }}</p>
                         <div class="flex items-center gap-2 md:justify-end">
-                            <a
-                                :href="`/users/${user.id}`"
+                            <Link
+                                :href="UserController.show(user.id)"
                                 class="grid h-10 w-10 place-items-center rounded-xl border border-[#d6ccbd] text-[#526158] transition hover:border-[#1d6a58] hover:text-[#1d6a58]"
                                 aria-label="View user"
                                 title="View user"
@@ -183,9 +183,9 @@ const destroy = (user) => {
                                     <path d="M2.5 12.9a1.8 1.8 0 0 1 0-1.8C3.6 9.2 7 5 12 5s8.4 4.2 9.5 6.1a1.8 1.8 0 0 1 0 1.8C20.4 14.8 17 19 12 19s-8.4-4.2-9.5-6.1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
                                     <path d="M12 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" stroke="currentColor" stroke-width="1.8" />
                                 </svg>
-                            </a>
-                            <a
-                                :href="`/users/${user.id}/edit`"
+                            </Link>
+                            <Link
+                                :href="UserController.edit(user.id)"
                                 class="grid h-10 w-10 place-items-center rounded-xl border border-[#d6ccbd] text-[#526158] transition hover:border-[#1d6a58] hover:text-[#1d6a58]"
                                 aria-label="Edit user"
                                 title="Edit user"
@@ -193,7 +193,7 @@ const destroy = (user) => {
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                     <path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z M14 8l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
-                            </a>
+                            </Link>
                             <button
                                 type="button"
                                 class="grid h-10 w-10 place-items-center rounded-xl border border-[#e4c1bc] text-[#b64235] transition hover:border-[#b64235] hover:bg-[#fff5f3]"

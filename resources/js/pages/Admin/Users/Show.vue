@@ -1,6 +1,7 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import LayoutDefault from '@/layouts/default.vue';
+import UserController from '../../../wayfinder/actions/App/Http/Controllers/Admin/UserController';
 
 const props = defineProps({
     user: {
@@ -16,7 +17,9 @@ const destroy = () => {
         return;
     }
 
-    deleteForm.delete(`/users/${props.user.id}`);
+    deleteForm.delete(UserController.destroy(props.user.id), {
+        preserveScroll: true,
+    });
 };
 </script>
 
@@ -45,15 +48,15 @@ const destroy = () => {
                     </div>
 
                     <div class="flex flex-col gap-3 sm:flex-row">
-                        <a
-                            :href="`/users/${user.id}/edit`"
+                        <Link
+                            :href="UserController.edit(user.id)"
                             class="flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#eebc55] px-5 text-sm font-black text-[#10251f] shadow-[0_14px_36px_rgba(0,0,0,.18)] transition hover:bg-[#f8d27d]"
                         >
                             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                                 <path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z M14 8l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                             Edit
-                        </a>
+                        </Link>
                         <button
                             type="button"
                             class="flex min-h-12 items-center justify-center gap-3 rounded-2xl border border-[#f3b9b1] px-5 text-sm font-black text-[#ffd6d0] transition hover:bg-white/10"
@@ -102,18 +105,18 @@ const destroy = () => {
             <aside class="rounded-[28px] border border-[#ded5c5] bg-[#fffbf3] p-5 shadow-sm sm:p-6">
                 <p class="text-sm font-bold uppercase tracking-[0.2em] text-[#bd7b2f]">Actions</p>
                 <div class="mt-5 grid gap-3">
-                    <a href="/users" class="flex min-h-12 items-center gap-3 rounded-2xl border border-[#d6ccbd] bg-white px-4 text-sm font-black text-[#27332f] transition hover:border-[#1d6a58] hover:text-[#1d6a58]">
+                    <Link :href="UserController.index()" class="flex min-h-12 items-center gap-3 rounded-2xl border border-[#d6ccbd] bg-white px-4 text-sm font-black text-[#27332f] transition hover:border-[#1d6a58] hover:text-[#1d6a58]">
                         <svg class="h-5 w-5 flex-none" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M19 12H5 M11 6l-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                         Back to users
-                    </a>
-                    <a :href="`/users/${user.id}/edit`" class="flex min-h-12 items-center gap-3 rounded-2xl border border-[#d6ccbd] bg-white px-4 text-sm font-black text-[#27332f] transition hover:border-[#1d6a58] hover:text-[#1d6a58]">
+                    </Link>
+                    <Link :href="UserController.edit(user.id)" class="flex min-h-12 items-center gap-3 rounded-2xl border border-[#d6ccbd] bg-white px-4 text-sm font-black text-[#27332f] transition hover:border-[#1d6a58] hover:text-[#1d6a58]">
                         <svg class="h-5 w-5 flex-none" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M4 20h4l10.5-10.5a2.1 2.1 0 0 0-3-3L5 17v3Z M14 8l2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                         Edit profile
-                    </a>
+                    </Link>
                 </div>
             </aside>
         </section>

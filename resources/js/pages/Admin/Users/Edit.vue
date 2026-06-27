@@ -1,6 +1,7 @@
 <script setup>
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import LayoutDefault from '@/layouts/default.vue';
+import UserController from '../../../wayfinder/actions/App/Http/Controllers/Admin/UserController';
 
 const props = defineProps({
     user: {
@@ -39,7 +40,7 @@ const submit = () => {
                     <p class="text-sm font-bold uppercase tracking-[0.2em] text-[#bd7b2f]">User profile</p>
                     <h2 class="mt-2 text-3xl font-black tracking-tight text-[#17201c]">{{ user.name }}</h2>
                 </div>
-                <a href="/users" class="text-sm font-black text-[#1d6a58] transition hover:text-[#bd7b2f]">Back to users</a>
+                <Link :href="UserController.index()" class="text-sm font-black text-[#1d6a58] transition hover:text-[#bd7b2f]">Back to users</Link>
             </div>
 
             <form class="mt-8 grid gap-5 lg:max-w-2xl" @submit.prevent="submit">
@@ -109,9 +110,9 @@ const submit = () => {
                         </svg>
                         Update user
                     </button>
-                    <a href="/users" class="flex min-h-14 items-center justify-center rounded-2xl border border-[#d6ccbd] bg-white px-6 text-base font-black text-[#526158] transition hover:border-[#1d6a58] hover:text-[#1d6a58]">
+                    <Link :href="UserController.index()" class="flex min-h-14 items-center justify-center rounded-2xl border border-[#d6ccbd] bg-white px-6 text-base font-black text-[#526158] transition hover:border-[#1d6a58] hover:text-[#1d6a58]">
                         Cancel
-                    </a>
+                    </Link>
                 </div>
             </form>
         </section>
