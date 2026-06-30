@@ -3,28 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use App\Repositories\UserRepository;
+use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class UserController extends Controller
 {
+    public function __construct(
+        private UserService $userService,
+        private UserRepository $userRepository
+    ) {}
+
     public function index(Request $request)
     {
         $search = $request->string('search')->toString();
-
-        $users = User::query()
-            ->search($search)
-            ->latest()
-            ->paginate($request->input('per_page', 10))
-            ->withQueryString()
-            ->through(fn (User $user) => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'created_at' => $user->created_at?->format('M j, Y'),
-            ]);
+        $users = $this->userService->index($search, $request->input('per_page', 10));
 
         return Inertia::render('Admin/Users/Index', [
             'users' => $users,
@@ -39,15 +36,9 @@ class UserController extends Controller
         return Inertia::render('Admin/Users/Create');
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
-        User::create($validated);
+        $this->userService->store($request->validated());
 
         return redirect()
             ->route('users.index')
@@ -57,41 +48,20 @@ class UserController extends Controller
     public function show(User $user)
     {
         return Inertia::render('Admin/Users/Show', [
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'email_verified_at' => $user->email_verified_at?->format('M j, Y'),
-                'created_at' => $user->created_at?->format('M j, Y'),
-                'updated_at' => $user->updated_at?->format('M j, Y'),
-            ],
+            'user' => $this->userRepository->formatForShow($user),
         ]);
     }
 
     public function edit(User $user)
     {
         return Inertia::render('Admin/Users/Edit', [
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-            ],
+            'user' => $this->userRepository->formatForEdit($user),
         ]);
     }
 
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user)],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-        ]);
-
-        if (blank($validated['password'])) {
-            unset($validated['password']);
-        }
-
-        $user->update($validated);
+        $this->userService->update($user, $request->validated());
 
         return redirect()
             ->route('users.index')
