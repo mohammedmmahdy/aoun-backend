@@ -10,10 +10,10 @@ import {
     PencilIcon,
     TrashIcon,
 } from "@heroicons/vue/24/outline";
-import UserController from "../../../wayfinder/actions/App/Http/Controllers/Admin/UserController";
+import ProviderController from "../../../wayfinder/actions/App/Http/Controllers/Admin/ProviderController";
 
 const props = defineProps({
-    users: {
+    providers: {
         type: Object,
         required: true,
     },
@@ -24,51 +24,55 @@ const props = defineProps({
 });
 
 const page = usePage();
-const perPage = ref(props.users.per_page || 10);
+const perPage = ref(props.providers.per_page || 10);
 const search = ref(props.filters.search || "");
 const deleteForm = useForm({});
 
 const flashSuccess = computed(() => page.props.flash?.success);
-const totalUsers = computed(() => props.users.total ?? props.users.data.length);
+const totalProviders = computed(
+    () => props.providers.total ?? props.providers.data.length,
+);
 
 watch(search, (value) => {
     router.get(
-        "/users",
+        "/providers",
         { search: value },
         {
             preserveState: true,
             replace: true,
-            only: ["users", "filters"],
+            only: ["providers", "filters"],
         },
     );
 });
 
 watch(perPage, (value) => {
     router.get(
-        "/users",
+        "/providers",
         { per_page: value },
         {
             preserveState: true,
             replace: true,
-            only: ["users", "filters"],
+            only: ["providers", "filters"],
         },
     );
 });
 
-const destroy = (user) => {
-    if (!window.confirm(`Delete ${user.name}?`)) {
+const destroy = (provider) => {
+    if (!window.confirm(`Delete ${provider.name}?`)) {
         return;
     }
 
-    deleteForm.delete(`/users/${user.id}`, {
+    deleteForm.delete(`/providers/${provider.id}`, {
         preserveScroll: true,
     });
 };
+
+console.log("Providers:", props.providers[0]);
 </script>
 
 <template>
     <layout-default>
-        <Head title="Users" />
+        <Head title="Providers" />
 
         <template #header>
             <p
@@ -77,78 +81,27 @@ const destroy = (user) => {
                 Directory
             </p>
             <h1 class="mt-1 text-2xl font-black tracking-tight text-[#17201c]">
-                Users
+                Providers
             </h1>
         </template>
 
-        <!-- <section
-            class="overflow-hidden rounded-[28px] bg-[#12352d] text-[#fff8e8] shadow-[0_24px_80px_rgba(42,35,24,.14)]"
-        >
-            <div class="relative px-5 py-7 sm:px-8 lg:px-10">
-                <div
-                    class="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(244,240,232,.14)_1px,transparent_1px),linear-gradient(90deg,rgba(244,240,232,.14)_1px,transparent_1px)] [background-size:44px_44px]"
-                ></div>
-                <div
-                    class="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"
-                >
-                    <div class="max-w-2xl">
-                        <p
-                            class="w-fit rounded-full border border-[#eebc55]/35 px-4 py-2 text-sm font-semibold text-[#f8e5b9]"
-                        >
-                            Account management
-                        </p>
-                        <h2
-                            class="mt-5 text-4xl font-black leading-tight tracking-tight text-[#fff8e8] sm:text-5xl"
-                        >
-                            Keep every user record tidy.
-                        </h2>
-                        <p
-                            class="mt-4 max-w-xl text-base leading-7 text-[#d9ebe5]"
-                        >
-                            Create, edit, search, and remove user accounts from
-                            the same focused admin workspace.
-                        </p>
-                    </div>
-
-                    <Link
-                        :href="UserController.create()"
-                        class="cursor-pointer flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#eebc55] px-5 text-sm font-black text-[#10251f] shadow-[0_14px_36px_rgba(0,0,0,.18)] transition hover:bg-[#f8d27d]"
-                    >
-                        <svg
-                            class="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            aria-hidden="true"
-                        >
-                            <path
-                                d="M12 5v14 M5 12h14"
-                                stroke="currentColor"
-                                stroke-width="1.8"
-                                stroke-linecap="round"
-                            />
-                        </svg>
-                        New user
-                    </Link>
-                </div>
-            </div>
-        </section> -->
         <Link
-            :href="UserController.create()"
+            :href="ProviderController.create()"
             class="cursor-pointer flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#eebc55] px-5 text-sm font-black text-[#10251f] shadow-[0_14px_36px_rgba(0,0,0,.18)] transition hover:bg-[#f8d27d]"
         >
             <PlusIcon class="h-5 w-5" />
-            New user
+            New provider
         </Link>
 
         <section class="mt-6 grid gap-4 sm:grid-cols-3">
             <article
                 class="rounded-2xl border border-[#ded5c5] bg-[#fffbf3] p-5 shadow-sm"
             >
-                <p class="text-sm font-bold text-[#66756d]">Total users</p>
+                <p class="text-sm font-bold text-[#66756d]">Total providers</p>
                 <p
                     class="mt-3 text-3xl font-black tracking-tight text-[#17201c]"
                 >
-                    {{ totalUsers }}
+                    {{ totalProviders }}
                 </p>
             </article>
             <article
@@ -158,7 +111,7 @@ const destroy = (user) => {
                 <p
                     class="mt-3 text-3xl font-black tracking-tight text-[#17201c]"
                 >
-                    {{ users.data.length }}
+                    {{ providers.data.length }}
                 </p>
             </article>
             <article
@@ -168,7 +121,7 @@ const destroy = (user) => {
                 <p
                     class="mt-3 text-3xl font-black tracking-tight text-[#17201c]"
                 >
-                    {{ users.current_page }}
+                    {{ providers.current_page }}
                 </p>
             </article>
         </section>
@@ -188,7 +141,7 @@ const destroy = (user) => {
                     <h3
                         class="mt-2 text-2xl font-black tracking-tight text-[#17201c]"
                     >
-                        User directory
+                        Provider directory
                     </h3>
                 </div>
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -202,7 +155,7 @@ const destroy = (user) => {
                             v-model="search"
                             type="search"
                             class="min-h-12 w-full border-0 bg-transparent px-3 text-sm font-semibold text-[#17201c] outline-none placeholder:text-[#9aa49d]"
-                            placeholder="Search users"
+                            placeholder="Search providers"
                         />
                     </div>
                     <div
@@ -231,71 +184,78 @@ const destroy = (user) => {
                 class="mt-6 overflow-hidden rounded-2xl border border-[#eadfce] bg-white"
             >
                 <div
-                    class="hidden grid-cols-[minmax(0,1.2fr)_minmax(0,1.4fr)_140px_220px] gap-4 border-b border-[#eadfce] bg-[#f8f4ed] px-5 py-4 text-xs font-black uppercase tracking-[0.16em] text-[#66756d] md:grid"
+                    class="hidden grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_140px_140px_220px] gap-4 border-b border-[#eadfce] bg-[#f8f4ed] px-5 py-4 text-xs font-black uppercase tracking-[0.16em] text-[#66756d] md:grid"
                 >
                     <span>Name</span>
                     <span>Email</span>
+                    <span>Type</span>
                     <span>Joined</span>
                     <span class="text-right">Actions</span>
                 </div>
 
-                <div v-if="users.data.length" class="divide-y divide-[#eadfce]">
+                <div
+                    v-if="providers.data.length"
+                    class="divide-y divide-[#eadfce]"
+                >
+
                     <article
-                        v-for="user in users.data"
-                        :key="user.id"
-                        class="grid gap-4 px-5 py-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1.4fr)_140px_220px] md:items-center"
+                        v-for="provider in providers.data"
+                        :key="provider.id"
+                        class="grid gap-4 px-5 py-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_140px_140px_220px] md:items-center"
                     >
                         <div class="flex items-center gap-3">
                             <div
                                 class="grid h-11 w-11 flex-none place-items-center rounded-2xl bg-[#1d6a58] text-sm font-black uppercase text-[#fff8e8]"
                             >
-                                {{ user.name.slice(0, 2) }}
+                                {{ provider.name.slice(0, 2) }}
                             </div>
                             <div class="min-w-0">
                                 <p
                                     class="truncate text-sm font-black text-[#27332f]"
                                 >
-                                    {{ user.name }}
+                                    {{ provider.name }}
                                 </p>
                                 <p
                                     class="mt-1 text-xs font-semibold text-[#728078] md:hidden"
                                 >
-                                    {{ user.email }}
+                                    {{ provider.email }}
                                 </p>
                             </div>
                         </div>
                         <p
                             class="hidden truncate text-sm font-semibold text-[#526158] md:block"
                         >
-                            {{ user.email }}
+                            {{ provider.email }}
                         </p>
                         <p class="text-sm font-semibold text-[#66756d]">
-                            {{ user.created_at }}
+                            {{ provider.type_label }}
+                        </p>
+                        <p class="text-sm font-semibold text-[#66756d]">
+                            {{ provider.created_at }}
                         </p>
                         <div class="flex items-center gap-2 md:justify-end">
                             <Link
-                                :href="UserController.show(user.id)"
+                                :href="ProviderController.show(provider.id)"
                                 class="grid h-10 w-10 place-items-center rounded-xl border border-[#d6ccbd] text-[#526158] transition hover:border-[#1d6a58] hover:text-[#1d6a58]"
-                                aria-label="View user"
-                                title="View user"
+                                aria-label="View provider"
+                                title="View provider"
                             >
                                 <EyeIcon class="h-5 w-5" />
                             </Link>
                             <Link
-                                :href="UserController.edit(user.id)"
+                                :href="ProviderController.edit(provider.id)"
                                 class="grid h-10 w-10 place-items-center rounded-xl border border-[#d6ccbd] text-[#526158] transition hover:border-[#1d6a58] hover:text-[#1d6a58]"
-                                aria-label="Edit user"
-                                title="Edit user"
+                                aria-label="Edit provider"
+                                title="Edit provider"
                             >
                                 <PencilIcon class="h-5 w-5" />
                             </Link>
                             <button
+                                @click="destroy(provider)"
+                                class="grid h-10 w-10 place-items-center rounded-xl border border-[#d6ccbd] text-[#b64235] transition hover:border-[#b64235]"
+                                aria-label="Delete provider"
+                                title="Delete provider"
                                 type="button"
-                                class="grid h-10 w-10 place-items-center rounded-xl border border-[#e4c1bc] text-[#b64235] transition hover:border-[#b64235] hover:bg-[#fff5f3]"
-                                aria-label="Delete user"
-                                title="Delete user"
-                                :disabled="deleteForm.processing"
-                                @click="destroy(user)"
                             >
                                 <TrashIcon class="h-5 w-5" />
                             </button>
@@ -304,16 +264,26 @@ const destroy = (user) => {
                 </div>
 
                 <div v-else class="px-5 py-12 text-center">
-                    <p class="text-lg font-black text-[#27332f]">
-                        No users found
-                    </p>
-                    <p class="mt-2 text-sm font-semibold text-[#728078]">
-                        Adjust the search or create a new user.
+                    <svg
+                        class="mx-auto h-12 w-12 text-[#c5b3a0]"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        aria-hidden="true"
+                    >
+                        <path
+                            d="M9.172 16.172a4 4 0 0 1 5.656 0M9 10a3 3 0 1 1 6 0 3 3 0 0 1-6 0ZM21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                        />
+                    </svg>
+                    <p class="mt-4 text-sm font-semibold text-[#66756d]">
+                        No providers found
                     </p>
                 </div>
             </div>
 
-            <Pagination :links="users.links" />
+            <Pagination :links="providers.links" />
         </section>
     </layout-default>
 </template>

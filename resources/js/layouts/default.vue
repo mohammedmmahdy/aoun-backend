@@ -2,13 +2,14 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { useDashboardPreferences } from '@/composables/useDashboardPreferences';
+import { HomeIcon, UserGroupIcon, BuildingOffice2Icon } from '@heroicons/vue/24/outline';
 
 const navItems = [
     {
         label: 'Dashboard',
         href: '/dashboard',
         match: '/dashboard',
-        icon: 'M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1v-8.5Z',
+        icon: HomeIcon,
     },
     // {
     //     label: 'Content',
@@ -20,7 +21,13 @@ const navItems = [
         label: 'Users',
         href: '/users',
         match: '/users',
-        icon: 'M16 11a4 4 0 1 0-8 0 M4.5 20a7.5 7.5 0 0 1 15 0',
+        icon: UserGroupIcon,
+    },
+    {
+        label: 'Providers',
+        href: '/providers',
+        match: '/providers',
+        icon: BuildingOffice2Icon,
     },
     // {
     //     label: 'Reports',
@@ -188,9 +195,10 @@ onBeforeUnmount(() => {
                             preferences.compactSidebar ? 'justify-center px-3' : '',
                         ]"
                     >
-                        <svg class="h-5 w-5 flex-none" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <!-- <svg class="h-5 w-5 flex-none" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path :d="item.icon" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
+                        </svg> -->
+                        <component :is="item.icon" class="h-5 w-5 flex-none" />
                         <span v-if="!preferences.compactSidebar">{{ item.label }}</span>
                     </Link>
                 </nav>

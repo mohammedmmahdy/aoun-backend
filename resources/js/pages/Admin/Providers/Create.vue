@@ -2,33 +2,32 @@
 import { Head, useForm, Link } from "@inertiajs/vue3";
 import LayoutDefault from "@/layouts/default.vue";
 import { ArrowPathIcon } from "@heroicons/vue/24/outline";
-import UserController from "../../../wayfinder/actions/App/Http/Controllers/Admin/UserController";
+import ProviderController from "../../../wayfinder/actions/App/Http/Controllers/Admin/ProviderController";
 
 const props = defineProps({
-    user: {
-        type: Object,
-        required: true,
+    types: {
+        type: Array,
     },
 });
 
 const form = useForm({
-    name: props.user.name,
-    email: props.user.email,
-    password: "",
-    password_confirmation: "",
+    name: "",
+    email: "",
+    type: "",
+    phone: "",
+    address: "",
 });
 
 const submit = () => {
-    form.put(`/users/${props.user.id}`, {
+    form.post(ProviderController.store(), {
         preserveScroll: true,
-        onSuccess: () => form.reset("password", "password_confirmation"),
     });
 };
 </script>
 
 <template>
     <layout-default>
-        <Head :title="`Edit ${user.name}`" />
+        <Head title="Create Provider" />
 
         <template #header>
             <p
@@ -37,7 +36,7 @@ const submit = () => {
                 Directory
             </p>
             <h1 class="mt-1 text-2xl font-black tracking-tight text-[#17201c]">
-                Edit User
+                Create Provider
             </h1>
         </template>
 
@@ -51,18 +50,18 @@ const submit = () => {
                     <p
                         class="text-sm font-bold uppercase tracking-[0.2em] text-[#bd7b2f]"
                     >
-                        User profile
+                        New account
                     </p>
                     <h2
                         class="mt-2 text-3xl font-black tracking-tight text-[#17201c]"
                     >
-                        {{ user.name }}
+                        Add a provider
                     </h2>
                 </div>
                 <Link
-                    :href="UserController.index()"
+                    :href="ProviderController.index()"
                     class="text-sm font-black text-[#1d6a58] transition hover:text-[#bd7b2f]"
-                    >Back to users</Link
+                    >Back to providers</Link
                 >
             </div>
 
@@ -78,7 +77,7 @@ const submit = () => {
                         v-model="form.name"
                         type="text"
                         class="min-h-14 w-full rounded-2xl border border-[#d6ccbd] bg-white px-4 text-base font-semibold text-[#17201c] outline-none transition placeholder:text-[#9aa49d] focus:border-[#1d6a58] focus:ring-4 focus:ring-[#1d6a58]/10"
-                        required
+                        placeholder="Provider name"
                     />
                     <p
                         v-if="form.errors.name"
@@ -99,7 +98,7 @@ const submit = () => {
                         v-model="form.email"
                         type="email"
                         class="min-h-14 w-full rounded-2xl border border-[#d6ccbd] bg-white px-4 text-base font-semibold text-[#17201c] outline-none transition placeholder:text-[#9aa49d] focus:border-[#1d6a58] focus:ring-4 focus:ring-[#1d6a58]/10"
-                        required
+                        placeholder="provider@example.com"
                     />
                     <p
                         v-if="form.errors.email"
@@ -109,51 +108,69 @@ const submit = () => {
                     </p>
                 </div>
 
-                <div class="rounded-2xl border border-[#eadfce] bg-white p-4">
-                    <p class="text-sm font-black text-[#27332f]">Password</p>
-                    <p
-                        class="mt-1 text-sm font-semibold leading-6 text-[#728078]"
+                <div>
+                    <label
+                        for="type"
+                        class="mb-2 block text-sm font-bold text-[#27332f]"
+                        >Type</label
                     >
-                        Leave both fields blank to keep the current password.
+                    <select
+                        id="type"
+                        v-model="form.type"
+                        class="min-h-14 w-full rounded-2xl border border-[#d6ccbd] bg-white px-4 text-base font-semibold text-[#17201c] outline-none transition focus:border-[#1d6a58] focus:ring-4 focus:ring-[#1d6a58]/10"
+                    >
+                        <option value="">Select a type</option>
+                        <option v-for="(type, key) in types" :key="key" :value="key">
+                            {{ type }}
+                        </option>
+                    </select>
+                    <p
+                        v-if="form.errors.type"
+                        class="mt-2 text-sm font-semibold text-[#b64235]"
+                    >
+                        {{ form.errors.type }}
                     </p>
+                </div>
 
-                    <div class="mt-4 grid gap-5 sm:grid-cols-2">
-                        <div>
-                            <label
-                                for="password"
-                                class="mb-2 block text-sm font-bold text-[#27332f]"
-                                >New password</label
-                            >
-                            <input
-                                id="password"
-                                v-model="form.password"
-                                type="password"
-                                class="min-h-14 w-full rounded-2xl border border-[#d6ccbd] bg-white px-4 text-base font-semibold text-[#17201c] outline-none transition placeholder:text-[#9aa49d] focus:border-[#1d6a58] focus:ring-4 focus:ring-[#1d6a58]/10"
-                                placeholder="At least 8 characters"
-                            />
-                            <p
-                                v-if="form.errors.password"
-                                class="mt-2 text-sm font-semibold text-[#b64235]"
-                            >
-                                {{ form.errors.password }}
-                            </p>
-                        </div>
+                <div>
+                    <label
+                        for="phone"
+                        class="mb-2 block text-sm font-bold text-[#27332f]"
+                        >Phone (optional)</label
+                    >
+                    <input
+                        id="phone"
+                        v-model="form.phone"
+                        type="tel"
+                        class="min-h-14 w-full rounded-2xl border border-[#d6ccbd] bg-white px-4 text-base font-semibold text-[#17201c] outline-none transition placeholder:text-[#9aa49d] focus:border-[#1d6a58] focus:ring-4 focus:ring-[#1d6a58]/10"
+                        placeholder="Phone number"
+                    />
+                    <p
+                        v-if="form.errors.phone"
+                        class="mt-2 text-sm font-semibold text-[#b64235]"
+                    >
+                        {{ form.errors.phone }}
+                    </p>
+                </div>
 
-                        <div>
-                            <label
-                                for="password_confirmation"
-                                class="mb-2 block text-sm font-bold text-[#27332f]"
-                                >Confirm password</label
-                            >
-                            <input
-                                id="password_confirmation"
-                                v-model="form.password_confirmation"
-                                type="password"
-                                class="min-h-14 w-full rounded-2xl border border-[#d6ccbd] bg-white px-4 text-base font-semibold text-[#17201c] outline-none transition placeholder:text-[#9aa49d] focus:border-[#1d6a58] focus:ring-4 focus:ring-[#1d6a58]/10"
-                                placeholder="Repeat password"
-                            />
-                        </div>
-                    </div>
+                <div>
+                    <label
+                        for="address"
+                        class="mb-2 block text-sm font-bold text-[#27332f]"
+                        >Address (optional)</label
+                    >
+                    <textarea
+                        id="address"
+                        v-model="form.address"
+                        class="min-h-24 w-full rounded-2xl border border-[#d6ccbd] bg-white px-4 py-3 text-base font-semibold text-[#17201c] outline-none transition placeholder:text-[#9aa49d] focus:border-[#1d6a58] focus:ring-4 focus:ring-[#1d6a58]/10"
+                        placeholder="Full address"
+                    />
+                    <p
+                        v-if="form.errors.address"
+                        class="mt-2 text-sm font-semibold text-[#b64235]"
+                    >
+                        {{ form.errors.address }}
+                    </p>
                 </div>
 
                 <div class="flex flex-col gap-3 pt-2 sm:flex-row">
@@ -166,10 +183,10 @@ const submit = () => {
                             v-if="form.processing"
                             class="h-5 w-5 animate-spin"
                         />
-                        Update user
+                        Save provider
                     </button>
                     <Link
-                        :href="UserController.index()"
+                        :href="ProviderController.index()"
                         class="flex min-h-14 items-center justify-center rounded-2xl border border-[#d6ccbd] bg-white px-6 text-base font-black text-[#526158] transition hover:border-[#1d6a58] hover:text-[#1d6a58]"
                     >
                         Cancel

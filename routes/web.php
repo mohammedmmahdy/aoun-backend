@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProviderController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,4 +20,5 @@ Route::group(['middleware' => ['auth:admin']], function () {
     Route::put('/profile', [ProfileController::class, 'update'])->name('admin.profile.update');
     Route::get('/settings', [ProfileController::class, 'settings'])->name('admin.settings');
     Route::resource('/users', UserController::class);
+    Route::resource('/providers', ProviderController::class);
 });
