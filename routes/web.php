@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ProviderController;
+use App\Http\Controllers\Admin\ServiceCategoryController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,4 +23,6 @@ Route::group(['middleware' => ['auth:admin']], function () {
     Route::get('/settings', [ProfileController::class, 'settings'])->name('admin.settings');
     Route::resource('/users', UserController::class);
     Route::resource('/providers', ProviderController::class);
+    Route::resource('/service-categories', ServiceCategoryController::class);
+    Route::resource('/services', ServiceController::class);
 });

@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { useDashboardPreferences } from '@/composables/useDashboardPreferences';
-import { HomeIcon, UserGroupIcon, BuildingOffice2Icon } from '@heroicons/vue/24/outline';
+import { HomeIcon, UserGroupIcon, BuildingOffice2Icon, ServerStackIcon, WrenchScrewdriverIcon } from '@heroicons/vue/24/outline';
 
 const navItems = [
     {
@@ -28,6 +28,18 @@ const navItems = [
         href: '/providers',
         match: '/providers',
         icon: BuildingOffice2Icon,
+    },
+    {
+        label: 'Service Categories',
+        href: '/service-categories',
+        match: '/service-categories',
+        icon: ServerStackIcon,
+    },
+    {
+        label: 'Services',
+        href: '/services',
+        match: '/services',
+        icon: WrenchScrewdriverIcon,
     },
     // {
     //     label: 'Reports',

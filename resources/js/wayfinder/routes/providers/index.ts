@@ -1,4 +1,4 @@
-import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../../../../wayfinder'
+import { queryParams, type RouteQueryOptions, type RouteDefinition, applyUrlDefaults } from './../../wayfinder'
 /**
 * @see \App\Http\Controllers\Admin\ProviderController::index
 * @see app/Http/Controllers/Admin/ProviderController.php:21
@@ -383,6 +383,14 @@ destroy.delete = (args: { provider: number | { id: number } } | [provider: numbe
     method: 'delete',
 })
 
-const ProviderController = { index, create, store, show, edit, update, destroy }
+const providers = {
+    index: Object.assign(index, index),
+    create: Object.assign(create, create),
+    store: Object.assign(store, store),
+    show: Object.assign(show, show),
+    edit: Object.assign(edit, edit),
+    update: Object.assign(update, update),
+    destroy: Object.assign(destroy, destroy),
+}
 
-export default ProviderController
+export default providers

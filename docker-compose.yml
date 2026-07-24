@@ -15,7 +15,7 @@ services:
     container_name: php
     build:
       context: .
-      dockerfile: ../docker/php/Dockerfile
+      dockerfile: ./docker/php/Dockerfile
     volumes:
       - ./:/var/www
     networks:

@@ -35,7 +35,7 @@ const totalProviders = computed(
 
 watch(search, (value) => {
     router.get(
-        "/providers",
+        ProviderController.index(),
         { search: value },
         {
             preserveState: true,
@@ -47,7 +47,7 @@ watch(search, (value) => {
 
 watch(perPage, (value) => {
     router.get(
-        "/providers",
+        ProviderController.index(),
         { per_page: value },
         {
             preserveState: true,
@@ -62,7 +62,7 @@ const destroy = (provider) => {
         return;
     }
 
-    deleteForm.delete(`/providers/${provider.id}`, {
+    deleteForm.delete(ProviderController.destroy(provider.id), {
         preserveScroll: true,
     });
 };

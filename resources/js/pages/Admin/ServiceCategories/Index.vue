@@ -10,10 +10,9 @@ import {
     PencilIcon,
     TrashIcon,
 } from "@heroicons/vue/24/outline";
-import UserController from "../../../wayfinder/actions/App/Http/Controllers/Admin/UserController";
-
+import ServiceCategoryController from "../../../wayfinder/actions/App/Http/Controllers/Admin/ServiceCategoryController";
 const props = defineProps({
-    users: {
+    serviceCategories: {
         type: Object,
         required: true,
     },
@@ -24,43 +23,44 @@ const props = defineProps({
 });
 
 const page = usePage();
-const perPage = ref(props.users.per_page || 10);
+const perPage = ref(props.serviceCategories.per_page || 10);
 const search = ref(props.filters.search || "");
 const deleteForm = useForm({});
 
 const flashSuccess = computed(() => page.props.flash?.success);
-const totalUsers = computed(() => props.users.total ?? props.users.data.length);
+const flashError = computed(() => page.props.flash?.error);
+const totalServiceCategories = computed(() => props.serviceCategories.total ?? props.serviceCategories.data.length);
 
 watch(search, (value) => {
     router.get(
-        UserController.index(),
+        ServiceCategoryController.index(),
         { search: value },
         {
             preserveState: true,
             replace: true,
-            only: ["users", "filters"],
+            only: ["serviceCategories", "filters"],
         },
     );
 });
 
 watch(perPage, (value) => {
     router.get(
-        UserController.index(),
+        ServiceCategoryController.index(),
         { per_page: value },
         {
             preserveState: true,
             replace: true,
-            only: ["users", "filters"],
+            only: ["serviceCategories", "filters"],
         },
     );
 });
 
-const destroy = (user) => {
-    if (!window.confirm(`Delete ${user.name}?`)) {
+const destroy = (serviceCategory) => {
+    if (!window.confirm(`Delete ${serviceCategory.name}?`)) {
         return;
     }
 
-    deleteForm.delete(`/users/${user.id}`, {
+    deleteForm.delete(ServiceCategoryController.destroy(serviceCategory.id), {
         preserveScroll: true,
     });
 };
@@ -68,7 +68,7 @@ const destroy = (user) => {
 
 <template>
     <layout-default>
-        <Head title="Users" />
+        <Head title="Service Categories" />
 
         <template #header>
             <p
@@ -77,78 +77,27 @@ const destroy = (user) => {
                 Directory
             </p>
             <h1 class="mt-1 text-2xl font-black tracking-tight text-[#17201c]">
-                Users
+                ServiceCategories
             </h1>
         </template>
 
-        <!-- <section
-            class="overflow-hidden rounded-[28px] bg-[#12352d] text-[#fff8e8] shadow-[0_24px_80px_rgba(42,35,24,.14)]"
-        >
-            <div class="relative px-5 py-7 sm:px-8 lg:px-10">
-                <div
-                    class="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(244,240,232,.14)_1px,transparent_1px),linear-gradient(90deg,rgba(244,240,232,.14)_1px,transparent_1px)] [background-size:44px_44px]"
-                ></div>
-                <div
-                    class="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"
-                >
-                    <div class="max-w-2xl">
-                        <p
-                            class="w-fit rounded-full border border-[#eebc55]/35 px-4 py-2 text-sm font-semibold text-[#f8e5b9]"
-                        >
-                            Account management
-                        </p>
-                        <h2
-                            class="mt-5 text-4xl font-black leading-tight tracking-tight text-[#fff8e8] sm:text-5xl"
-                        >
-                            Keep every user record tidy.
-                        </h2>
-                        <p
-                            class="mt-4 max-w-xl text-base leading-7 text-[#d9ebe5]"
-                        >
-                            Create, edit, search, and remove user accounts from
-                            the same focused admin workspace.
-                        </p>
-                    </div>
-
-                    <Link
-                        :href="UserController.create()"
-                        class="cursor-pointer flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#eebc55] px-5 text-sm font-black text-[#10251f] shadow-[0_14px_36px_rgba(0,0,0,.18)] transition hover:bg-[#f8d27d]"
-                    >
-                        <svg
-                            class="h-5 w-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            aria-hidden="true"
-                        >
-                            <path
-                                d="M12 5v14 M5 12h14"
-                                stroke="currentColor"
-                                stroke-width="1.8"
-                                stroke-linecap="round"
-                            />
-                        </svg>
-                        New user
-                    </Link>
-                </div>
-            </div>
-        </section> -->
         <Link
-            :href="UserController.create()"
+            :href="ServiceCategoryController.create()"
             class="cursor-pointer flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-[#eebc55] px-5 text-sm font-black text-[#10251f] shadow-[0_14px_36px_rgba(0,0,0,.18)] transition hover:bg-[#f8d27d]"
         >
             <PlusIcon class="h-5 w-5" />
-            New user
+            New Service Category
         </Link>
 
         <section class="mt-6 grid gap-4 sm:grid-cols-3">
             <article
                 class="rounded-2xl border border-[#ded5c5] bg-[#fffbf3] p-5 shadow-sm"
             >
-                <p class="text-sm font-bold text-[#66756d]">Total users</p>
+                <p class="text-sm font-bold text-[#66756d]">Total Service Categories</p>
                 <p
                     class="mt-3 text-3xl font-black tracking-tight text-[#17201c]"
                 >
-                    {{ totalUsers }}
+                    {{ totalServiceCategories }}
                 </p>
             </article>
             <article
@@ -158,7 +107,7 @@ const destroy = (user) => {
                 <p
                     class="mt-3 text-3xl font-black tracking-tight text-[#17201c]"
                 >
-                    {{ users.data.length }}
+                    {{ serviceCategories.data.length }}
                 </p>
             </article>
             <article
@@ -168,7 +117,7 @@ const destroy = (user) => {
                 <p
                     class="mt-3 text-3xl font-black tracking-tight text-[#17201c]"
                 >
-                    {{ users.current_page }}
+                    {{ serviceCategories.current_page }}
                 </p>
             </article>
         </section>
@@ -188,7 +137,7 @@ const destroy = (user) => {
                     <h3
                         class="mt-2 text-2xl font-black tracking-tight text-[#17201c]"
                     >
-                        User directory
+                        Service Category directory
                     </h3>
                 </div>
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -202,7 +151,7 @@ const destroy = (user) => {
                             v-model="search"
                             type="search"
                             class="min-h-12 w-full border-0 bg-transparent px-3 text-sm font-semibold text-[#17201c] outline-none placeholder:text-[#9aa49d]"
-                            placeholder="Search users"
+                            placeholder="Search Service Categories"
                         />
                     </div>
                     <div
@@ -226,76 +175,75 @@ const destroy = (user) => {
             >
                 {{ flashSuccess }}
             </p>
+            <p
+                v-if="flashError"
+                class="mt-5 rounded-2xl border border-[#e4c1bc] bg-[#fff5f3] px-4 py-3 text-sm font-black text-[#b64235]"
+            >
+                {{ flashError }}
+            </p>
 
             <div
                 class="mt-6 overflow-hidden rounded-2xl border border-[#eadfce] bg-white"
             >
                 <div
-                    class="hidden grid-cols-[minmax(0,1.2fr)_minmax(0,1.4fr)_140px_220px] gap-4 border-b border-[#eadfce] bg-[#f8f4ed] px-5 py-4 text-xs font-black uppercase tracking-[0.16em] text-[#66756d] md:grid"
+                    class="hidden grid-cols-4 gap-4 border-b border-[#eadfce] bg-[#f8f4ed] px-5 py-4 text-xs font-black uppercase tracking-[0.16em] text-[#66756d] md:grid"
                 >
                     <span>Name</span>
-                    <span>Email</span>
-                    <span>Joined</span>
+                    <span>Service Count</span>
+                    <span>Created</span>
                     <span class="text-right">Actions</span>
                 </div>
 
-                <div v-if="users.data.length" class="divide-y divide-[#eadfce]">
+                <div v-if="serviceCategories.data.length" class="divide-y divide-[#eadfce]">
                     <article
-                        v-for="user in users.data"
-                        :key="user.id"
-                        class="grid gap-4 px-5 py-4 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1.4fr)_140px_220px] md:items-center"
+                        v-for="serviceCategory in serviceCategories.data"
+                        :key="serviceCategory.id"
+                        class="grid gap-4 px-5 py-4 md:grid-cols-4 md:items-center"
                     >
                         <div class="flex items-center gap-3">
                             <div
                                 class="grid h-11 w-11 flex-none place-items-center rounded-2xl bg-[#1d6a58] text-sm font-black uppercase text-[#fff8e8]"
                             >
-                                {{ user.name.slice(0, 2) }}
+                                {{ serviceCategory.name.slice(0, 2) }}
                             </div>
                             <div class="min-w-0">
                                 <p
                                     class="truncate text-sm font-black text-[#27332f]"
                                 >
-                                    {{ user.name }}
-                                </p>
-                                <p
-                                    class="mt-1 text-xs font-semibold text-[#728078] md:hidden"
-                                >
-                                    {{ user.email }}
+                                    {{ serviceCategory.name }}
                                 </p>
                             </div>
                         </div>
-                        <p
-                            class="hidden truncate text-sm font-semibold text-[#526158] md:block"
-                        >
-                            {{ user.email }}
+                        <p class="text-sm font-semibold text-[#66756d]">
+                            {{ serviceCategory.service_count }}
                         </p>
                         <p class="text-sm font-semibold text-[#66756d]">
-                            {{ user.created_at }}
+                            {{ serviceCategory.created_at }}
                         </p>
                         <div class="flex items-center gap-2 md:justify-end">
-                            <Link
-                                :href="UserController.show(user.id)"
+                            <!-- <Link
+                                :href="ServiceCategoryController.show(serviceCategory.id)"
                                 class="grid h-10 w-10 place-items-center rounded-xl border border-[#d6ccbd] text-[#526158] transition hover:border-[#1d6a58] hover:text-[#1d6a58]"
-                                aria-label="View user"
-                                title="View user"
+                                aria-label="View Service Category"
+                                title="View Service Category"
                             >
                                 <EyeIcon class="h-5 w-5" />
-                            </Link>
+                            </Link> -->
                             <Link
-                                :href="UserController.edit(user.id)"
+                                :href="ServiceCategoryController.edit(serviceCategory.id)"
                                 class="grid h-10 w-10 place-items-center rounded-xl border border-[#d6ccbd] text-[#526158] transition hover:border-[#1d6a58] hover:text-[#1d6a58]"
-                                aria-label="Edit user"
-                                title="Edit user"
+                                aria-label="Edit Service Category"
+                                title="Edit Service Category"
                             >
                                 <PencilIcon class="h-5 w-5" />
                             </Link>
                             <button
                                 type="button"
                                 class="grid h-10 w-10 place-items-center rounded-xl border border-[#e4c1bc] text-[#b64235] transition hover:border-[#b64235] hover:bg-[#fff5f3]"
-                                aria-label="Delete user"
-                                title="Delete user"
+                                aria-label="Delete Service Category"
+                                title="Delete Service Category"
                                 :disabled="deleteForm.processing"
-                                @click="destroy(user)"
+                                @click="destroy(serviceCategory)"
                             >
                                 <TrashIcon class="h-5 w-5" />
                             </button>
@@ -305,15 +253,15 @@ const destroy = (user) => {
 
                 <div v-else class="px-5 py-12 text-center">
                     <p class="text-lg font-black text-[#27332f]">
-                        No users found
+                        No Service Categories found
                     </p>
                     <p class="mt-2 text-sm font-semibold text-[#728078]">
-                        Adjust the search or create a new user.
+                        Adjust the search or create a new Service Category.
                     </p>
                 </div>
             </div>
 
-            <Pagination :links="users.links" />
+            <Pagination :links="serviceCategories.links" />
         </section>
     </layout-default>
 </template>
